@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dao.LendingPeriodDao">
+
+	<select id="findAll" resultType="com.entity.LendingPeriod">
+			select * from lendingPeriod
+	</select>
+
+	<select id="selectByPeriod" parameterType="string" resultType="string">
+			select distinct period from
+			lendingPeriod  where period=#{period}
+	</select>
+
+	<update id="modifyStatus" parameterType="com.entity.LendingPeriod">
+		update lendingPeriod set
+		status=#{status} where
+		lendingPeriodid=#{lendingPeriodId}
+	</update>
+
+	<insert id="insert" parameterType="com.entity.LendingPeriod">
+		insert into lendingPeriod (period,status) values(#{period},1)
+	</insert>
+
+	<update id="modify" parameterType="com.entity.LendingPeriod">
+		update
+		lendingPeriod set
+		period=#{period} where
+		lendingPeriodId=#{lendingPeriodId}
+	</update>
+</mapper>

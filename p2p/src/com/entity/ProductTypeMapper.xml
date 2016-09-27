@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dao.ProductTypeDao">
+
+	<insert id="insert" parameterType="com.entity.ProductType">
+		insert into productType (productTypeName,status) values (#{productTypeName},1)
+	</insert>
+	
+	<update id="modify" parameterType="com.entity.ProductType">
+		update productType set
+		productTypeName=#{productTypeName} 
+		where productTypeId=#{productTypeId}
+	</update>
+	
+	<update id="modifyStatus" parameterType="com.entity.ProductType">
+		update productType set
+		status=#{status} 
+		where productTypeId=#{productTypeId}
+	</update>
+
+	<select id="findAll" resultType="com.entity.ProductType">
+		select * from productType
+	</select>
+
+	<select id="findById" parameterType="int" resultType="com.entity.ProductType">
+		select * from productType where productTypeId=#{productTypeId}
+	</select>
+</mapper>

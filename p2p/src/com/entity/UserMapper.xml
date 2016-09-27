@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.SysuserDao">
+ 
+  <select id="selectByLoginname" parameterType="string" resultType="com.entity.Sysuser">
+		select * from sysuser where loginName=#{loginName}
+  </select>
+  
+  <select id="selectByLoginnameAndLoginpassword" parameterType="com.entity.Sysuser" resultType="com.entity.Sysuser">
+		select * from sysuser where loginName=#{loginName} and loginPassword=#{loginPassword}
+  </select>
+  
+  <update id="modifyPassword" parameterType="com.entity.Sysuser">
+		update sysuser
+		set
+		loginpassword=#{loginPassword}
+		where loginname=#{loginName} 
+  </update>
+</mapper>

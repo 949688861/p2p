@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dao.CompanyDao">
+
+	<insert id="insert" parameterType="com.entity.Company">
+		insert into company (companyName,financingInReturn,companyDetail) 
+			values
+		(#{companyName},#{financingInReturn},#{companyDetail}) 
+	</insert>
+	
+	<delete id="deleteById" parameterType="int">
+		delete from company where companyId=#{companyId}
+	</delete>
+
+	<update id="modify" parameterType="com.entity.Company">
+		update company set companyName=#{companyName},financingInReturn=#{financingInReturn},
+		companyDetail=#{companyDetail} where companyId=#{companyId}
+	</update>
+	
+	<select id="selectByCompanyId" parameterType="int" resultType="com.entity.Company">
+		select * 
+		from company
+		where companyId=#{companyId}
+	</select>
+	
+	<select id="findAll"  resultType="com.entity.Company">
+		select * 
+		from company
+	</select>
+
+	<!-- companyReport -->
+	<select id="queryAll" resultType="com.vo.CompanyReportVo">
+<!--		 select c.companyName,nums.num productNum,temp.items items,  -->
+<!--				 actual.actualNum actualNum,actual.actualNum*c.financingInReturn/100 commission,  -->
+<!--				 c.companyId  -->
+<!--		from company c  -->
+<!--		right join (select count(1) num,id from (select p.companyId id  -->
+<!--	                from (select distinct applyProductId from apply) te  -->
+<!--	                join product p on p.productId = te.applyProductId) t  -->
+<!--	                group by t.id) nums on nums.id=c.companyId  -->
+<!--		right join (select companyId,sum(financingAmountTo) items from product,apply where productId=applyProductId group by companyId) temp   -->
+<!--	              on temp.companyId=c.companyId  -->
+<!--		right join (select sum(tem.appNum) actualNum,p.companyId cid  -->
+<!--	              from (select sum(applyNum) appNum,applyProductId from apply group by applyProductId) tem,product p  -->
+<!--	              where tem.applyProductId=p.productId  -->
+<!--	              group by p.companyId) actual  -->
+<!--              on actual.cid=c.companyId  --> 
+	
+	 select c.companyName,nums.num productNum,temp.items items,
+				 actual.actualNum actualNum,actual.actualNum*c.financingInReturn/100 commission,
+				 c.companyId
+		from company c
+		right join (select count(1) num,id from (select p.companyId id
+	                from (select distinct applyProductId from apply) te
+	                join product p on p.productId = te.applyProductId) t
+	                group by t.id) nums on nums.id=c.companyId
+		right join (select t.companyId,sum(p.financingAmountTo) items from product p,(select companyId,productId from product,apply where productId=applyProductId group by companyId,productId) t  
+						where p.productId=t.productId GROUP BY t.companyId) temp
+						on temp.companyId=c.companyId
+		right join (select sum(tem.appNum) actualNum,p.companyId cid
+	              from (select sum(applyNum) appNum,applyProductId from apply group by applyProductId) tem,product p
+	              where tem.applyProductId=p.productId
+	              group by p.companyId) actual
+	              on actual.cid=c.companyId 
+	
+	
+<!-- 	查询该公司下所有产品的总融资目标 -->
+<!-- 			select c.companyName,temp.num productNum,temp.items items, -->
+<!-- 					 actual.actualNum actualNum,actual.actualNum*c.financingInReturn/100 commission, -->
+<!-- 					 c.companyId    -->
+<!-- 			from company c -->
+<!-- 			right join (select count(1) num,companyId,sum(financingAmountTo) items from product group by companyId) temp  -->
+<!-- 	              on temp.companyId=c.companyId -->
+<!-- 			right join (select sum(tem.appNum) actualNum,p.companyId cid -->
+<!-- 	              from (select sum(applyNum) appNum,applyProductId from apply group by applyProductId) tem,product p -->
+<!-- 	              where tem.applyProductId=p.productId -->
+<!-- 	              group by p.companyId) actual -->
+<!-- 	              on actual.cid=c.companyId  -->
+	</select>
+	
+	<select id="queryByYear" parameterType="string" resultType="com.vo.CompanyReportVo">
+			 select c.companyName,nums.num productNum,temp.items items,
+				 actual.actualNum actualNum,actual.actualNum*c.financingInReturn/100 commission,
+				 c.companyId
+			from company c
+			right join (select count(1) num,id from (select p.companyId id
+		                from (select distinct applyProductId from apply where date_format(applyDate,'%Y') = #{year}) te
+		                join product p on p.productId = te.applyProductId) t
+		                group by t.id) nums on nums.id=c.companyId
+			right join  (select t.companyId,sum(p.financingAmountTo) items from product p,(select companyId,productId from product,apply where productId=applyProductId and date_format(applyDate,'%Y')=#{year} group by companyId,productId) t  
+						where p.productId=t.productId GROUP BY t.companyId) temp
+						on temp.companyId=c.companyId
+			
+			<!--  (select companyId,sum(financingAmountTo) items from product,apply where productId=applyProductId and date_format(applyDate,'%Y')=#{year}  group by companyId) temp  -->
+		           <!--   on temp.companyId=c.companyId -->
+			right join (select sum(tem.appNum) actualNum,p.companyId cid
+	              from (select sum(te.applyNum) appNum,te.applyProductId from  
+	              (select applyNum,applyProductId from apply where date_format(applyDate,'%Y') = #{year}) te 
+	              group by te.applyProductId) tem,product p
+	              where tem.applyProductId=p.productId
+	              group by p.companyId) actual
+	              on actual.cid=c.companyId
+	
+	<!-- 	查询该公司下所有产品的总融资目标 -->
+<!-- 			select c.companyName,temp.num productNum,temp.items items, -->
+<!-- 					 actual.actualNum actualNum,actual.actualNum*c.financingInReturn/100 commission, -->
+<!-- 					 c.companyId    -->
+<!-- 			from company c -->
+<!-- 			right join (select count(1) num,companyId,sum(financingAmountTo) items from product group by companyId) temp  -->
+<!-- 	              on temp.companyId=c.companyId -->
+<!-- 			right join (select sum(tem.appNum) actualNum,p.companyId cid -->
+<!-- 	              from (select sum(te.applyNum) appNum,te.applyProductId from   -->
+<!-- 	              (select applyNum,applyProductId from apply where date_format(applyDate,'%Y') = #{year}) te  -->
+<!-- 	              group by te.applyProductId) tem,product p -->
+<!-- 	              where tem.applyProductId=p.productId -->
+<!-- 	              group by p.companyId) actual -->
+<!-- 	              on actual.cid=c.companyId -->
+	</select>
+	
+	<select id="queryByIdAndYear" parameterType="com.vo.CompanyReportVo" resultType="com.vo.CompanyReportVo">
+		select p.productName,p.financingAmountTo items,
+				  actual.appNum actualNum,
+				  actual.appNum*c.financingInReturn/100 commission,
+				  c.companyName,date_format(p.createtime,'%Y') year
+		from product p
+		right join (select sum(applyNum) appNum,applyProductId from apply where 1=1
+				<if test="year != '' ">
+					and date_format(applyDate,'%Y') = #{year}
+				</if>
+				group by applyProductId) actual
+	      		on actual.applyProductId=p.productId
+		right join company c on c.companyId=p.companyId
+		where p.companyId=#{companyId}
+	</select>
+	
+	
+</mapper>

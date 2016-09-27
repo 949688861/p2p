@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd 
+									 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+									 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+<!-- 扫包 -->
+	<context:component-scan base-package="com.service.impl"/>
+	<context:component-scan base-package="com.controller"/>
+	
+	<context:property-placeholder location="classpath:dataSource.properties"/>	
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+<!-- 		<property name="typeAliasesPackage" value="entity"></property> -->
+		<property name="mapperLocations">
+			<list>
+<!-- 				<value>classpath:mapper/UserMapper.xml</value> -->
+				<value>classpath:com/entity/*.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+<!-- 	<bean id="userDao" class="org.mybatis.spring.mapper.MapperFactoryBean"> -->
+<!-- 		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property> -->
+<!-- 		<property name="mapperInterface" value="dao.UserDao"></property> -->
+<!-- 	</bean> -->
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.dao"></property>
+	</bean>
+	
+	<context:annotation-config></context:annotation-config>
+	
+<!--	扫mvc注解-->
+	<mvc:annotation-driven />
+	
+<!--视图解析 将视图名 解析为具体的视图	-->	
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+		<property name="prefix" value="/WEB-INF/pages/" />
+		<property name="suffix" value=".jsp" />
+		<property name="contentType" value="text/html;charset=utf-8"></property>
+	</bean>
+	
+<!--	将请求路径转换为视图名	-->
+	<mvc:view-controller path="/toLogin" view-name="backend/login" />
+	<mvc:view-controller path="/toMain" view-name="backend/main" />
+	<mvc:view-controller path="/toProductAdd" view-name="backend/productAdd" />
+	<mvc:view-controller path="/toNewsAdd" view-name="backend/newsAdd" />
+	<mvc:view-controller path="/toCompanyAdd" view-name="backend/companyAdd" />
+	<!--处理静态资源(WebRoot下的)-->
+	<mvc:default-servlet-handler />
+	
+	<!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 --> 
+	 <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	    <property name="defaultEncoding" value="utf-8" />
+	    <property name="maxUploadSize" value="1048576000" />
+	    <property name="maxInMemorySize" value="40960" />
+	 </bean>
+	
+</beans>
